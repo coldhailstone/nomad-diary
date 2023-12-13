@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Alert } from 'react-native';
 import styled from 'styled-components/native';
 import colors from '../colors';
 import { useDB } from '../context';
+import { InterstitialAd, AdEventType, TestIds } from 'react-native-google-mobile-ads';
 
 const View = styled.View`
     background-color: ${colors.bgColor};
@@ -53,7 +54,22 @@ const EmotionText = styled.Text`
 
 const emotions = ['🤯', '🥲', '🤬', '🤗', '🥰', '😊', '🤩'];
 
+const unitID =
+    Platform.select({
+        ios: 'ca-app-pub-5764958954883940/6949276489',
+    }) || '';
+const adUnitId = __DEV__ ? TestIds.INTERSTITIAL : unitID;
+const interstitial = InterstitialAd.createForAdRequest(adUnitId);
+
 const Write = ({ navigation: { goBack } }) => {
+    useEffect(() => {
+        interstitial.load();
+        const unsubscribe = interstitial.addAdEventListener(AdEventType.CLOSED, () => {
+            goBack();
+        });
+        return unsubscribe;
+    }, []);
+
     const realm = useDB();
     const [selectedEmotion, setEmotion] = useState(null);
     const [feelings, setFeelings] = useState('');
@@ -70,9 +86,7 @@ const Write = ({ navigation: { goBack } }) => {
                 message: feelings,
             });
         });
-        setEmotion(null);
-        setFeelings('');
-        goBack();
+        interstitial.show();
     };
 
     return (

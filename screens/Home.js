@@ -1,12 +1,15 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
 import { FlatList, LayoutAnimation, TouchableOpacity } from 'react-native';
+import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
 import styled from 'styled-components/native';
 import colors from '../colors';
 import { useDB } from '../context';
 
 const View = styled.View`
     flex: 1;
+    justify-content: center;
+    align-items: center;
     padding: 0px 50px;
     padding-top: 100px;
     background-color: ${colors.bgColor};
@@ -14,7 +17,7 @@ const View = styled.View`
 const Title = styled.Text`
     color: ${colors.textColor};
     font-size: 38px;
-    margin-bottom: 100px;
+    width: 100%;
 `;
 const Btn = styled.TouchableOpacity`
     position: absolute;
@@ -28,9 +31,6 @@ const Btn = styled.TouchableOpacity`
     background-color: ${colors.btnColor};
     elevation: 5;
     box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.3);
-`;
-const BtnText = styled.Text`
-    color: white;
 `;
 const Record = styled.View`
     background-color: ${colors.cardColor};
@@ -49,6 +49,12 @@ const Message = styled.Text`
 const Separator = styled.View`
     height: 10px;
 `;
+
+const unitID =
+    Platform.select({
+        ios: 'ca-app-pub-5764958954883940/3015251973',
+    }) || '';
+const adUnitId = __DEV__ ? TestIds.BANNER : unitID;
 
 const Home = ({ navigation: { navigate } }) => {
     const realm = useDB();
@@ -71,8 +77,16 @@ const Home = ({ navigation: { navigate } }) => {
 
     return (
         <View>
-            <Title>My journal2</Title>
+            <Title>My journal</Title>
+            <BannerAd
+                unitId={adUnitId}
+                size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
+                requestOptions={{
+                    requestNonPersonalizedAdsOnly: true,
+                }}
+            />
             <FlatList
+                style={{ marginVertical: 50, width: '100%' }}
                 ItemSeparatorComponent={Separator}
                 contentContainerStyle={{ paddingVertical: 10 }}
                 data={feelings}
