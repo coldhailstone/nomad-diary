@@ -3,7 +3,7 @@ import { Alert } from 'react-native';
 import styled from 'styled-components/native';
 import colors from '../colors';
 import { useDB } from '../context';
-import { InterstitialAd, AdEventType, TestIds } from 'react-native-google-mobile-ads';
+import { RewardedAd, RewardedAdEventType, TestIds } from 'react-native-google-mobile-ads';
 
 const View = styled.View`
     background-color: ${colors.bgColor};
@@ -54,40 +54,56 @@ const EmotionText = styled.Text`
 
 const emotions = ['🤯', '🥲', '🤬', '🤗', '🥰', '😊', '🤩'];
 
-const unitID =
-    Platform.select({
-        ios: 'ca-app-pub-5764958954883940/6949276489',
-    }) || '';
-const adUnitId = __DEV__ ? TestIds.INTERSTITIAL : unitID;
-const interstitial = InterstitialAd.createForAdRequest(adUnitId);
+const unitID = Platform.select({
+    ios: 'ca-app-pub-5764958954883940/1227527585',
+});
+const adUnitId = __DEV__ ? TestIds.REWARDED : unitID;
+const rewarded = RewardedAd.createForAdRequest(adUnitId);
 
 const Write = ({ navigation: { goBack } }) => {
-    useEffect(() => {
-        interstitial.load();
-        const unsubscribe = interstitial.addAdEventListener(AdEventType.CLOSED, () => {
-            goBack();
-        });
-        return unsubscribe;
-    }, []);
-
     const realm = useDB();
     const [selectedEmotion, setEmotion] = useState(null);
     const [feelings, setFeelings] = useState('');
     const onChangeText = (text) => setFeelings(text);
     const onEmotionPress = (face) => setEmotion(face);
+
+    const [loaded, setLoaded] = useState(false);
+    useEffect(() => {
+        const unsubscribeLoaded = rewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
+            setLoaded(true);
+        });
+
+        rewarded.load();
+
+        return unsubscribeLoaded;
+    }, []);
+
     const onSubmit = () => {
         if (!feelings || !selectedEmotion) {
             return Alert.alert('Please complete form.');
         }
-        realm.write(() => {
-            realm.create('Feeling', {
-                _id: Date.now(),
-                emotion: selectedEmotion,
-                message: feelings,
-            });
-        });
-        interstitial.show();
+
+        const unsubscribeEarned = rewarded.addAdEventListener(
+            RewardedAdEventType.EARNED_REWARD,
+            (reward) => {
+                console.log(reward, selectedEmotion, feelings);
+                realm.write(() => {
+                    realm.create('Feeling', {
+                        _id: Date.now(),
+                        emotion: selectedEmotion,
+                        message: feelings,
+                    });
+                });
+                goBack();
+                unsubscribeEarned();
+            }
+        );
+        rewarded.show();
     };
+
+    if (!loaded) {
+        return null;
+    }
 
     return (
         <View>

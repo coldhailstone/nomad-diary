@@ -50,10 +50,9 @@ const Separator = styled.View`
     height: 10px;
 `;
 
-const unitID =
-    Platform.select({
-        ios: 'ca-app-pub-5764958954883940/3015251973',
-    }) || '';
+const unitID = Platform.select({
+    ios: 'ca-app-pub-5764958954883940/3015251973',
+});
 const adUnitId = __DEV__ ? TestIds.BANNER : unitID;
 
 const Home = ({ navigation: { navigate } }) => {
