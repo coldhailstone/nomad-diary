@@ -64,7 +64,7 @@ const Write = ({ navigation: { goBack } }) => {
             return Alert.alert('Please complete form.');
         }
         realm.write(() => {
-            const feeling = realm.create('Feeling', {
+            realm.create('Feeling', {
                 _id: Date.now(),
                 emotion: selectedEmotion,
                 message: feelings,
