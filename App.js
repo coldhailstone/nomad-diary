@@ -21,11 +21,17 @@ export default function App() {
     const [ready, setReady] = useState(false);
     const [realm, setRealm] = useState(null);
     const startLoading = async () => {
-        const connection = await Realm.open({
-            path: 'nomadDiaryDB',
-            schema: [FeelingSchema],
-        });
-        setRealm(connection);
+        try {
+            const connection = await Realm.open({
+                path: 'nomadDiaryDB',
+                schema: [FeelingSchema],
+            });
+            setRealm(connection);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setReady(true);
+        }
     };
     useEffect(() => {
         startLoading();
@@ -36,6 +42,8 @@ export default function App() {
             await SplashScreen.hideAsync();
         }
     }, [ready]);
+
+    if (!ready) return null;
 
     return (
         <DBContext.Provider value={realm}>
