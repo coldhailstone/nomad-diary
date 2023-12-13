@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Alert } from 'react-native';
+import { RewardedAd, RewardedAdEventType, TestIds } from 'react-native-google-mobile-ads';
 import styled from 'styled-components/native';
 import colors from '../colors';
 import { useDB } from '../context';
-import { RewardedAd, RewardedAdEventType, TestIds } from 'react-native-google-mobile-ads';
 
 const View = styled.View`
     background-color: ${colors.bgColor};
@@ -85,8 +85,7 @@ const Write = ({ navigation: { goBack } }) => {
 
         const unsubscribeEarned = rewarded.addAdEventListener(
             RewardedAdEventType.EARNED_REWARD,
-            (reward) => {
-                console.log(reward, selectedEmotion, feelings);
+            () => {
                 realm.write(() => {
                     realm.create('Feeling', {
                         _id: Date.now(),
