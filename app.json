@@ -1,11 +1,12 @@
 {
-  "expo": {
+    "expo": {
+        "name": "nomad-diary",
+        "slug": "nomad-diary",
+        "version": "1.0.0",
+        "assetBundlePatterns": ["**/*"]
+    },
     "name": "nomad-diary",
-    "slug": "nomad-diary",
-    "version": "1.0.0",
-    "assetBundlePatterns": [
-      "**/*"
-    ]
-  },
-  "name": "nomad-diary"
+    "react-native-google-mobile-ads": {
+        "ios_app_id": "ca-app-pub-5764958954883940~1976151400"
+    }
 }
